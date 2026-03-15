@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 
 import '../core/network/ping_api_client.dart';
 import '../features/instagram_frame/instagram_frame.dart';
+import '../features/profile/profile_page.dart';
 
 class DoomscrollDaycareApp extends StatelessWidget {
   const DoomscrollDaycareApp({super.key});
 
   static const _defaultPingEndpoint = String.fromEnvironment(
     'SCROLL_PING_ENDPOINT',
-    defaultValue: 'https://httpbin.org/post',
+    defaultValue: 'http://10.0.10.93:8000/tap-events',
   );
 
   static const _instagramUrl = String.fromEnvironment(
@@ -27,10 +28,14 @@ class DoomscrollDaycareApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.pink),
         useMaterial3: true,
       ),
-      home: InstagramFramePage(
-        instagramUrl: _instagramUrl,
-        pingClient: pingClient,
-      ),
+      initialRoute: InstagramFramePage.routeName,
+      routes: {
+        InstagramFramePage.routeName: (context) => InstagramFramePage(
+              instagramUrl: _instagramUrl,
+              pingClient: pingClient,
+            ),
+        ProfilePage.routeName: (context) => const ProfilePage(),
+      },
     );
   }
 }
