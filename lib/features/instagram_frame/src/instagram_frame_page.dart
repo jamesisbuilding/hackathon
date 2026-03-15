@@ -7,8 +7,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 
 import '../../../core/network/ping_api_client.dart';
-import 'instagram_menu_drawer.dart';
-import 'liquid_glass_button.dart';
+import 'menu.dart';
 
 class InstagramFramePage extends StatefulWidget {
   const InstagramFramePage({
@@ -199,89 +198,41 @@ class _InstagramFramePageState extends State<InstagramFramePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Instagram Frame'),
-      ),
-      drawer: const InstagramMenuDrawer(
-        currentRouteName: InstagramFramePage.routeName,
-      ),
-      body: Listener(
-        behavior: HitTestBehavior.translucent,
-        onPointerDown: (event) {
-          setState(() {
-            _fabCollapseSignal += 1;
-          });
-          _touchStartY = event.position.dy;
-          _hasFiredForThisTouch = false;
-        },
-        onPointerMove: (event) {
-          if (_touchStartY == null) return;
-          if (_hasFiredForThisTouch) return;
+      body: SafeArea(
+        bottom: false,
+        child: Stack(
+          children: [
+            Listener(
+              behavior: HitTestBehavior.deferToChild,
+              onPointerDown: (event) {
+                setState(() {
+                  _fabCollapseSignal += 1;
+                });
+                _touchStartY = event.position.dy;
+                _hasFiredForThisTouch = false;
+              },
+              onPointerMove: (event) {
+                if (_touchStartY == null) return;
+                if (_hasFiredForThisTouch) return;
 
-          final dy = event.position.dy - _touchStartY!;
-          if (dy < -10) {
-            _hasFiredForThisTouch = true;
-            _recordScrollDown(); // synchronous, no async needed
-          }
-        },
-        onPointerUp: (_) {
-          _touchStartY = null;
-          _hasFiredForThisTouch = false;
-        },
-        onPointerCancel: (_) {
-          _touchStartY = null;
-          _hasFiredForThisTouch = false;
-        },
-        child: WebViewWidget(controller: _controller),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: LiquidGlassButton(
-        onTap: _flushTaps,
-        label: 'Ping',
-        collapseSignal: _fabCollapseSignal,
-        buttons: [
-          _MiniFabAction(
-            icon: Icons.refresh,
-            onTap: () async {
-              await _controller.reload();
-            },
-          ),
-          _MiniFabAction(
-            icon: Icons.person_outline,
-            onTap: () {
-              if (!mounted) return;
-              Navigator.of(context).pushNamed('/profile');
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _MiniFabAction extends StatelessWidget {
-  const _MiniFabAction({
-    required this.onTap,
-    required this.icon,
-  });
-
-  final VoidCallback onTap;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        customBorder: const CircleBorder(),
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: Icon(
-            icon,
-            size: 20,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
+                final dy = event.position.dy - _touchStartY!;
+                if (dy < -10) {
+                  _hasFiredForThisTouch = true;
+                  _recordScrollDown(); // synchronous, no async needed
+                }
+              },
+              onPointerUp: (_) {
+                _touchStartY = null;
+                _hasFiredForThisTouch = false;
+              },
+              onPointerCancel: (_) {
+                _touchStartY = null;
+                _hasFiredForThisTouch = false;
+              },
+              child: WebViewWidget(controller: _controller),
+            ),
+            HoverMenu(navigationContext: context),
+          ],
         ),
       ),
     );

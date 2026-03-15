@@ -41,6 +41,7 @@ dependencies:
   delayed_display: ^2.0.0
   flutter_spinkit: ^5.2.1
   liquid_glass_renderer: ^0.2.0-dev.4
+  flutter_local_notifications: ^18.0.1
 
 dev_dependencies:
   flutter_test:
