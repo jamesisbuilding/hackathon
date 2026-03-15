@@ -8,6 +8,7 @@ import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 
 import '../../../core/network/ping_api_client.dart';
 import 'instagram_menu_drawer.dart';
+import 'liquid_glass_button.dart';
 
 class InstagramFramePage extends StatefulWidget {
   const InstagramFramePage({
@@ -97,13 +98,10 @@ class _InstagramFramePageState extends State<InstagramFramePage> {
   final List<Map<String, dynamic>> _pendingTaps = [];
   Timer? _flushTimer;
 
-  // UI feedback
-  int _pingCount = 0;
-  DateTime? _lastPingAt;
-
   // Touch tracking
   double? _touchStartY;
   bool _hasFiredForThisTouch = false;
+  int _fabCollapseSignal = 0;
 
   @override
   void initState() {
@@ -191,10 +189,7 @@ class _InstagramFramePageState extends State<InstagramFramePage> {
     try {
       await widget.pingClient.sendScrollDownPing(uid: "test1", taps: batch);
       if (!mounted) return;
-      setState(() {
-        _pingCount += batch.length;
-        _lastPingAt = timestamp;
-      });
+      dev.log('Flushed ${batch.length} taps at $timestamp');
     } catch (_) {
       // On failure, put them back so they're retried next flush.
       _pendingTaps.insertAll(0, batch);
@@ -213,6 +208,9 @@ class _InstagramFramePageState extends State<InstagramFramePage> {
       body: Listener(
         behavior: HitTestBehavior.translucent,
         onPointerDown: (event) {
+          setState(() {
+            _fabCollapseSignal += 1;
+          });
           _touchStartY = event.position.dy;
           _hasFiredForThisTouch = false;
         },
@@ -235,6 +233,56 @@ class _InstagramFramePageState extends State<InstagramFramePage> {
           _hasFiredForThisTouch = false;
         },
         child: WebViewWidget(controller: _controller),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: LiquidGlassButton(
+        onTap: _flushTaps,
+        label: 'Ping',
+        collapseSignal: _fabCollapseSignal,
+        buttons: [
+          _MiniFabAction(
+            icon: Icons.refresh,
+            onTap: () async {
+              await _controller.reload();
+            },
+          ),
+          _MiniFabAction(
+            icon: Icons.person_outline,
+            onTap: () {
+              if (!mounted) return;
+              Navigator.of(context).pushNamed('/profile');
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MiniFabAction extends StatelessWidget {
+  const _MiniFabAction({
+    required this.onTap,
+    required this.icon,
+  });
+
+  final VoidCallback onTap;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        customBorder: const CircleBorder(),
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Icon(
+            icon,
+            size: 20,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
       ),
     );
   }

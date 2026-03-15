@@ -29,6 +29,6 @@ class PingApiClient {
       endpoint,
       data: <String, dynamic>{'uid': uid, 'taps': taps},
     );
-    print('API response: ${response.statusCode} $response');
+    log('API response: ${response.statusCode} $response');
   }
 }
