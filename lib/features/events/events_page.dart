@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/network/events_api_client.dart';
+import '../../core/user/user_state.dart';
 import '../instagram_frame/src/menu.dart';
 
 class EventNavigationArgs {
@@ -29,7 +30,8 @@ class _EventsPageState extends State<EventsPage> {
   @override
   void initState() {
     super.initState();
-    _future = widget.eventsClient.fetchEvents(uid: 'user-callflow');
+    _future =
+        widget.eventsClient.fetchEvents(uid: UserState.uid ?? 'anonymous');
   }
 
   @override
@@ -56,7 +58,8 @@ class _EventsPageState extends State<EventsPage> {
           RefreshIndicator(
             onRefresh: () async {
               setState(() {
-                _future = widget.eventsClient.fetchEvents(uid: 'user-callflow');
+                _future = widget.eventsClient
+                    .fetchEvents(uid: UserState.uid ?? 'anonymous');
               });
               await _future;
             },

@@ -24,11 +24,9 @@ class PingApiClient {
     required String uid,
     required List<Map<String, dynamic>> taps,
   }) async {
-    log('Tap = ${<String, dynamic>{'uid': uid, 'taps': taps}}');
-    final response = await _dio.post<void>(
+    await _dio.post<void>(
       endpoint,
       data: <String, dynamic>{'uid': uid, 'taps': taps},
     );
-    log('API response: ${response.statusCode} $response');
   }
 }

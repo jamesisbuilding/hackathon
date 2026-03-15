@@ -1,11 +1,31 @@
 import 'package:flutter/material.dart';
 
+import '../../core/user/user_state.dart';
 import '../instagram_frame/src/menu.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
   static const routeName = '/profile';
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: UserState.uid ?? '');
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +37,6 @@ class ProfilePage extends StatelessWidget {
           children: [
             Column(
               children: [
-                // to receive the uid from user
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Container(
@@ -44,6 +63,10 @@ class ProfilePage extends StatelessWidget {
                       ],
                     ),
                     child: TextField(
+                      controller: _controller,
+                      onChanged: (value) {
+                        UserState.uid = value;
+                      },
                       style: Theme.of(
                         context,
                       ).textTheme.bodyMedium?.copyWith(letterSpacing: 0.5),
@@ -98,3 +121,4 @@ class ProfilePage extends StatelessWidget {
     );
   }
 }
+

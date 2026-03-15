@@ -7,6 +7,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 
 import '../../../core/network/ping_api_client.dart';
+import '../../../core/user/user_state.dart';
 import 'menu.dart';
 
 class InstagramFramePage extends StatefulWidget {
@@ -185,8 +186,9 @@ class _InstagramFramePageState extends State<InstagramFramePage> {
     _pendingTaps.clear();
 
     final timestamp = DateTime.now();
+    final uid = UserState.uid ?? 'anonymous';
     try {
-      await widget.pingClient.sendScrollDownPing(uid: "test1", taps: batch);
+      await widget.pingClient.sendScrollDownPing(uid: uid, taps: batch);
       if (!mounted) return;
       dev.log('Flushed ${batch.length} taps at $timestamp');
     } catch (_) {
